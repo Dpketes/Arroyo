@@ -58,6 +58,7 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
     //val prioridades = context.resources.getStringArray(R.array.prioridad_tarea)
     val estadosTarea = context.resources.getStringArray(R.array.estado_tarea)
     //val colorFondo = if (prioridadSeleccionada == prioridades[2]) ColorPrioridadAlta else Color.Transparent
+    
 
     //Inicializamos el esqueleto de la aplicación con scaffold, donde importaremos varias 4 cosas de el archivo components, como los dropdowns/selects, el radiobutton con las tres opciones definidas en strings.xml y el ratingBar
     Scaffold(
