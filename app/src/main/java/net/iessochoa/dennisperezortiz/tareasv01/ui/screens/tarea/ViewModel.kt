@@ -14,6 +14,8 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application.applicationContext
 
     val listaPrioridad = context.resources.getStringArray(R.array.prioridad_tarea).toList()
+    val listaCategoria = context.resources.getStringArray(R.array.categoria_tarea).toList()
+
 
     private val PRIORIDAD_ALTA = listaPrioridad[2]
 
@@ -30,10 +32,33 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             Color.Transparent
         }
-
         _uiStateTarea.value = _uiStateTarea.value.copy(
             prioridad = nuevaPrioridad,
             colorFondo = colorFondo
         )
+    }
+
+    fun onCategoriaChange(nuevaCategoria: String) {
+        _uiStateTarea.value = _uiStateTarea.value.copy(categoria = nuevaCategoria)
+    }
+
+    fun onPagadoChange(isPagado: Boolean) {
+        _uiStateTarea.value = _uiStateTarea.value.copy(pagado = isPagado)
+    }
+
+    fun onEstadoChange(nuevoEstado: String) {
+        _uiStateTarea.value = _uiStateTarea.value.copy(estado = nuevoEstado)
+    }
+
+    fun onValoracionChange(nuevaValoracion: Int) {
+        _uiStateTarea.value = _uiStateTarea.value.copy(valoracion = nuevaValoracion)
+    }
+
+    fun onTecnicoChange(tecnico: String) {
+        _uiStateTarea.value = _uiStateTarea.value.copy(tecnico = tecnico)
+    }
+
+    fun onDescripcionChange(descripcion: String) {
+        _uiStateTarea.value = _uiStateTarea.value.copy(descripcion = descripcion)
     }
 }

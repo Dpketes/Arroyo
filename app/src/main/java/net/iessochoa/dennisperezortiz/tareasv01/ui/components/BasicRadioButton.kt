@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -13,7 +12,7 @@ import androidx.compose.ui.unit.dp
 //Creo la función de RadioButton ademas de insertarlo en un row y añadirle mas modificaciones de estilo para que se vea como la imagen del ejercicio
 @Composable
 fun BasicRadioButton(
-    selectedOption: MutableState<String>,
+    selectedOption: String,
     onOptionSelected: (String) -> Unit,
     options: Array<String>
 ) {
@@ -24,7 +23,7 @@ fun BasicRadioButton(
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 RadioButton(
-                    selected = selectedOption.value == option,
+                    selected = selectedOption == option,
                     onClick = { onOptionSelected(option) }
                 )
                 Text(text = option)

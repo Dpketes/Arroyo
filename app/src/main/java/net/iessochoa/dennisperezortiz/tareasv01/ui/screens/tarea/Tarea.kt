@@ -15,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -24,10 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,15 +46,15 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
     val uiStateTarea by viewModel.uiStateTarea.collectAsState()
 
     //Aqui almacenamos el estado actual de los campos
-    var categoriaSeleccionada by remember { mutableStateOf("") }
+    //var categoriaSeleccionada by remember { mutableStateOf("") }
     //var prioridadSeleccionada by remember { mutableStateOf("") }
-    var isPagado by remember { mutableStateOf(false) }
-    val estadoTarea = remember { mutableStateOf("") }
-    var valoracionCliente by remember { mutableIntStateOf(0) }
-    var tecnico by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
+    //var isPagado by remember { mutableStateOf(false) }
+    //val estadoTarea = remember { mutableStateOf("") }
+    //var valoracionCliente by remember { mutableIntStateOf(0) }
+    //var tecnico by remember { mutableStateOf("") }
+    //var descripcion by remember { mutableStateOf("") }
     val context = LocalContext.current
-    val categorias = context.resources.getStringArray(R.array.categoria_tarea)
+    //val categorias = context.resources.getStringArray(R.array.categoria_tarea)
     //val prioridades = context.resources.getStringArray(R.array.prioridad_tarea)
     val estadosTarea = context.resources.getStringArray(R.array.estado_tarea)
     //val colorFondo = if (prioridadSeleccionada == prioridades[2]) ColorPrioridadAlta else Color.Transparent
@@ -81,7 +76,7 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
                     horizontalArrangement = Arrangement.Center
                     ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        DropdownMenu(categorias, stringResource(R.string.categoria), onSelectionChanged = { categoriaSeleccionada = it })
+                        DropdownMenu(viewModel.listaCategoria, stringResource(R.string.categoria), onSelectionChanged = { viewModel.onCategoriaChange(it) })
                         DropdownMenu(viewModel.listaPrioridad, stringResource(R.string.prioridad), onSelectionChanged = { viewModel.onValueChangePrioridad(it)})
                     }
                     Spacer(modifier = Modifier.width(8.dp))
@@ -98,12 +93,11 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
 
                 //Aqui iniciamos otro row que contendrá la funcionalidad del switch que basicamente es el cambio entre los iconos, segun este switcheado o no, el texto importado de stringresourcdes y el switchbutton
                 Row(modifier = Modifier.padding(8.dp, 0.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painter = if (isPagado) painterResource(R.drawable.ic_pagado) else painterResource(R.drawable.ic_no_pagado), contentDescription = null)
+                    Icon(painter = if (uiStateTarea.pagado) painterResource(R.drawable.ic_pagado) else painterResource(R.drawable.ic_no_pagado), contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.pagado))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Switch(checked = isPagado, onCheckedChange = { isPagado = it })
-
+                    Switch(checked = uiStateTarea.pagado, onCheckedChange = { viewModel.onPagadoChange(it)})
                 }
 
                 //Aqui veremos segun seleccionemos en el radiobutton un icono u otro
@@ -111,7 +105,7 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
                     Text(text = stringResource(R.string.estado_tarea_titulo))
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    estadoTarea.value.let { estado ->
+                    uiStateTarea.estado.let { estado ->
                         val iconId = when (estado) {
                             "Abierta" -> R.drawable.ic_abierto
                             "En curso" -> R.drawable.ic_en_curso
@@ -129,17 +123,17 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
                     }
                 }
 
-                BasicRadioButton(selectedOption = estadoTarea, onOptionSelected = { estadoTarea.value = it }, options = estadosTarea)
+                BasicRadioButton(selectedOption = uiStateTarea.estado, onOptionSelected = { viewModel.onEstadoChange(it)}, options = estadosTarea)
 
                 //El rating bar no he sabido darle menos espacio entre los iconos o mejor dicho imagenes vectoriales.
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = stringResource(R.string.valoracion_cliente))
-                    RatingBar(valoracionCliente, onRatingChanged = { valoracionCliente = it })
+                    RatingBar(rating = uiStateTarea.valoracion, onRatingChanged = { viewModel.onValoracionChange(it) })
                 }
 
                 OutlinedTextField(
-                    value = tecnico,
-                    onValueChange = { tecnico = it },
+                    value = uiStateTarea.tecnico,
+                    onValueChange = { viewModel.onTecnicoChange(it) },
                     label = { Text(stringResource(R.string.tecnico)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
@@ -151,8 +145,8 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
                     .fillMaxWidth()
                     .weight(1f)) {
                     OutlinedTextField(
-                        value = descripcion,
-                        onValueChange = { descripcion = it },
+                        value = uiStateTarea.descripcion,
+                        onValueChange = { viewModel.onDescripcionChange(it) },
                         label = { Text(stringResource(R.string.descripcion)) },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -160,11 +154,6 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
                         keyboardOptions = KeyboardOptions.Default.copy(),
                         singleLine = false
                     )
-                }
-
-                // Este es un boton que he creado por mi cuenta para guardar los archivos aun no le he metido la logica pero supongo que trabajaremos con eso ya que has dicho que creemos listatareas dentro de ui.screens, aparte de uno para controlar navegaciones, y por ello he pensado que asi adelantaba código.
-                Button(onClick = {/*Aqui es donde supuestamente ira la logica del boton guardar*/}) {
-                    Text(stringResource(R.string.guardar))
                 }
             }
         }
