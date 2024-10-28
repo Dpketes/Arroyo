@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 //Creamos la funcion dropdown o select como quieras llamarlo y le he definido la logica
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenu(options: Array<String>, label: String, onSelectionChanged: (String) -> Unit) {
+fun DropdownMenu(options: List<String>, label: String, onSelectionChanged: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options[0]) }
 

@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -38,18 +38,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import net.iessochoa.dennisperezortiz.tareasv01.R
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.BasicRadioButton
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DropdownMenu
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.RatingBar
-import net.iessochoa.dennisperezortiz.tareasv01.ui.theme.ColorPrioridadAlta
 import net.iessochoa.dennisperezortiz.tareasv01.ui.theme.TareasV01Theme
 
 @Composable
-fun TareaScreen() {
+fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Modifier) {
+
+    val uiStateTarea by viewModel.uiStateTarea.collectAsState()
+
     //Aqui almacenamos el estado actual de los campos
     var categoriaSeleccionada by remember { mutableStateOf("") }
-    var prioridadSeleccionada by remember { mutableStateOf("") }
+    //var prioridadSeleccionada by remember { mutableStateOf("") }
     var isPagado by remember { mutableStateOf(false) }
     val estadoTarea = remember { mutableStateOf("") }
     var valoracionCliente by remember { mutableIntStateOf(0) }
@@ -57,13 +60,13 @@ fun TareaScreen() {
     var descripcion by remember { mutableStateOf("") }
     val context = LocalContext.current
     val categorias = context.resources.getStringArray(R.array.categoria_tarea)
-    val prioridades = context.resources.getStringArray(R.array.prioridad_tarea)
+    //val prioridades = context.resources.getStringArray(R.array.prioridad_tarea)
     val estadosTarea = context.resources.getStringArray(R.array.estado_tarea)
-    val colorFondo = if (prioridadSeleccionada == prioridades[2]) ColorPrioridadAlta else Color.Transparent
+    //val colorFondo = if (prioridadSeleccionada == prioridades[2]) ColorPrioridadAlta else Color.Transparent
 
     //Inicializamos el esqueleto de la aplicación con scaffold, donde importaremos varias 4 cosas de el archivo components, como los dropdowns/selects, el radiobutton con las tres opciones definidas en strings.xml y el ratingBar
     Scaffold(
-        containerColor = colorFondo,
+        containerColor = uiStateTarea.colorFondo,
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -79,7 +82,7 @@ fun TareaScreen() {
                     ) {
                     Column(modifier = Modifier.weight(1f)) {
                         DropdownMenu(categorias, stringResource(R.string.categoria), onSelectionChanged = { categoriaSeleccionada = it })
-                        DropdownMenu(prioridades, stringResource(R.string.prioridad), onSelectionChanged = { prioridadSeleccionada = it })
+                        DropdownMenu(viewModel.listaPrioridad, stringResource(R.string.prioridad), onSelectionChanged = { viewModel.onValueChangePrioridad(it)})
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Image(
