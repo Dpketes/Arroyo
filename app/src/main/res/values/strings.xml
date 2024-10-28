@@ -6,8 +6,11 @@
 
     <string-array name="categoria_tarea">
         <item>Reparación</item>
-        <item>Mantenimiento</item>
         <item>Instalación</item>
+        <item>Mantenimiento</item>
+        <item>Comercial</item>
+        <item>otros</item>
+
     </string-array>
 
     <string-array name="prioridad_tarea">

@@ -154,7 +154,7 @@ fun TareaScreen() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState()),
-                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                        keyboardOptions = KeyboardOptions.Default.copy(),
                         singleLine = false
                     )
                 }
