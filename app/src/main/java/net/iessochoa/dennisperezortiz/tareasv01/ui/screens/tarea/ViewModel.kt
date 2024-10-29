@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import net.iessochoa.dennisperezortiz.tareasv01.R
 import net.iessochoa.dennisperezortiz.tareasv01.ui.theme.ColorPrioridadAlta
 
+//clase ViewModel donde definimos las acciones que van a realizar los objetos de tarea.
 class TareaViewModel(application: Application) : AndroidViewModel(application) {
 
     private val context = application.applicationContext
@@ -55,10 +56,35 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onTecnicoChange(tecnico: String) {
-        _uiStateTarea.value = _uiStateTarea.value.copy(tecnico = tecnico)
+        _uiStateTarea.value = _uiStateTarea.value.copy(
+            tecnico = tecnico,
+            esFormularioValido = tecnico.isNotBlank() && _uiStateTarea.value.descripcion.isNotBlank()
+        )
     }
 
     fun onDescripcionChange(descripcion: String) {
-        _uiStateTarea.value = _uiStateTarea.value.copy(descripcion = descripcion)
+        _uiStateTarea.value = _uiStateTarea.value.copy(
+            descripcion = descripcion,
+            esFormularioValido = descripcion.isNotBlank() && _uiStateTarea.value.descripcion.isNotBlank()
+        )
+    }
+
+    //Nuevas acciones de guardar para que si apretamos el boton guardar, se abra el dialogo, y al apretar dentro del dialogo a cualquier accion como cancel u ok, se deje de mostrar el dialogo
+    fun onGuardar() {
+        _uiStateTarea.value = _uiStateTarea.value.copy(
+            mostrarDialogo = true
+        )
+    }
+
+    fun onConfirmarDialogoGuardar() {
+        _uiStateTarea.value = _uiStateTarea.value.copy(
+            mostrarDialogo = false
+        )
+    }
+
+    fun onCancelarDialogoGuardar() {
+        _uiStateTarea.value = _uiStateTarea.value.copy(
+            mostrarDialogo = false
+        )
     }
 }

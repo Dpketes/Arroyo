@@ -15,14 +15,22 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,16 +42,22 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import net.iessochoa.dennisperezortiz.tareasv01.R
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.BasicRadioButton
+import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DialogoDeConfirmacion
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DropdownMenu
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.RatingBar
 import net.iessochoa.dennisperezortiz.tareasv01.ui.theme.TareasV01Theme
 
 @Composable
-fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Modifier) {
+fun TareaScreen(viewModel: TareaViewModel = viewModel()) {
+
+//creamos el estado de uiStateTarea, el estado de SnackBar y el de CoroutineScope. Aparte de comentar todos los demas que son inutiles al usar UiState
 
     val uiStateTarea by viewModel.uiStateTarea.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     //Aqui almacenamos el estado actual de los campos
     //var categoriaSeleccionada by remember { mutableStateOf("") }
@@ -58,11 +72,38 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
     //val prioridades = context.resources.getStringArray(R.array.prioridad_tarea)
     val estadosTarea = context.resources.getStringArray(R.array.estado_tarea)
     //val colorFondo = if (prioridadSeleccionada == prioridades[2]) ColorPrioridadAlta else Color.Transparent
-    
+
+    //Como dices que hay usar strings.xml para lo que sea texto, me he creado mis valores, ya que no me dejaba hacerlo dentro del message directamente.
+    val mensajeFaltaCampos = stringResource(R.string.message_falta_campos)
+    val tareaGuardada = stringResource(R.string.tarea_guardada)
+    val tituloDialogo = stringResource(R.string.dialogo_title)
+    val contextDialogo = stringResource(R.string.dialogo_context)
 
     //Inicializamos el esqueleto de la aplicación con scaffold, donde importaremos varias 4 cosas de el archivo components, como los dropdowns/selects, el radiobutton con las tres opciones definidas en strings.xml y el ratingBar
     Scaffold(
         containerColor = uiStateTarea.colorFondo,
+        snackbarHost = { SnackbarHost(snackbarHostState)},
+        //Creamos el floatingbutton como explica la tarea difiniendo sus acciones y haciendo uso de el uistate creado si esta bien o un mensaje snackbar si falta por rellenar tecnico y/o descripción.
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                if (uiStateTarea.esFormularioValido)
+                    viewModel.onGuardar()
+                else {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = mensajeFaltaCampos,
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            }
+            ) {
+                Icon(
+                    painter = painterResource(android.R.drawable.ic_menu_save),
+                    contentDescription = "guardar"
+                )
+            }
+        },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -155,6 +196,29 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel(), modifier: Modifier = Mo
                         keyboardOptions = KeyboardOptions.Default.copy(),
                         singleLine = false
                     )
+                }
+                //Como dice la tarea hacemos un if de los dialogos para definir su uso y cierre.
+                if (uiStateTarea.mostrarDialogo) {
+                    DialogoDeConfirmacion(
+                        onDismissRequest = {
+                            //cancela el dialogo
+                            viewModel.onCancelarDialogoGuardar()
+                        },
+                        onConfirmation = {
+                            //guardaría los cambios
+                            viewModel.onConfirmarDialogoGuardar()
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = tareaGuardada,
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        },
+                        dialogTitle = tituloDialogo,
+                        dialogText = contextDialogo,
+                        icon = Icons.Default.Info
+                    )
+
                 }
             }
         }

@@ -32,4 +32,11 @@
     <string name="tecnico">Técnico</string>
     <string name="descripcion">Descripción</string>
     <string name="guardar">Guardar</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="message_falta_campos">Hay que rellenar todos los campos</string>
+    <string name="tarea_guardada">Tarea guardada</string>
+    <string name="dialogo_title">Atención</string>
+    <string name="dialogo_context">Desea guardar los cambios?</string>
 </resources>
