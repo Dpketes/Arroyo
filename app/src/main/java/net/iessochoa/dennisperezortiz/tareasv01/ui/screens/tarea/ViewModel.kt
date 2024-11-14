@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import net.iessochoa.dennisperezortiz.tareasv01.R
+import net.iessochoa.dennisperezortiz.tareasv01.data.db.entities.Tarea
+import net.iessochoa.dennisperezortiz.tareasv01.data.repository.Repository
 import net.iessochoa.dennisperezortiz.tareasv01.ui.theme.ColorPrioridadAlta
 
 //clase ViewModel donde definimos las acciones que van a realizar los objetos de tarea.
@@ -17,6 +19,7 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
     val listaPrioridad = context.resources.getStringArray(R.array.prioridad_tarea).toList()
     val listaCategoria = context.resources.getStringArray(R.array.categoria_tarea).toList()
 
+    val listaEstado = context.resources.getStringArray(R.array.estado_tarea).toList()
 
     private val PRIORIDAD_ALTA = listaPrioridad[2]
 
@@ -26,6 +29,8 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
         )
     )
     val uiStateTarea: StateFlow<UiStateTarea> = _uiStateTarea.asStateFlow()
+
+    var tarea: Tarea? = null
 
     fun onValueChangePrioridad(nuevaPrioridad: String) {
         val colorFondo: Color = if (PRIORIDAD_ALTA == nuevaPrioridad) {
@@ -87,4 +92,53 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
             mostrarDialogo = false
         )
     }
+
+    fun tareaToUiState(tarea: Tarea) {
+        _uiStateTarea.value = _uiStateTarea.value.copy(
+            categoria = listaCategoria[tarea.categoria],
+            prioridad = listaPrioridad[tarea.prioridad],
+            pagado = tarea.pagado,
+            estado = listaEstado[tarea.estado],
+            valoracion = tarea.valoracionCliente,
+            tecnico = tarea.tecnico,
+            descripcion = tarea.descripcion,
+            esFormularioValido = tarea.tecnico.isNotBlank() &&
+                    tarea.descripcion.isNotBlank(),
+            esTareaNueva = false,
+            colorFondo = if (PRIORIDAD_ALTA == listaPrioridad[tarea.prioridad])
+                ColorPrioridadAlta else Color.Transparent
+        )
+    }
+
+    fun uiStateToTarea(): Tarea {
+        return if (uiStateTarea.value.esTareaNueva)
+        //si es nueva, le asigna un id
+            Tarea(
+                categoria = listaCategoria.indexOf(uiStateTarea.value.categoria),
+                prioridad = listaPrioridad.indexOf(uiStateTarea.value.prioridad),
+                img = R.drawable.foto3.toString(),
+                pagado = uiStateTarea.value.pagado,
+                estado = listaEstado.indexOf(uiStateTarea.value.estado),
+                valoracionCliente = uiStateTarea.value.valoracion,
+                tecnico = uiStateTarea.value.tecnico,
+                descripcion = uiStateTarea.value.descripcion
+            ) //si no es nueva, actualiza la tarea
+        else Tarea(
+            tarea!!.id,
+            categoria = listaCategoria.indexOf(uiStateTarea.value.categoria),
+            prioridad = listaPrioridad.indexOf(uiStateTarea.value.prioridad),
+            img = tarea!!.img,
+            pagado = uiStateTarea.value.pagado,
+            estado = listaEstado.indexOf(uiStateTarea.value.estado),
+            valoracionCliente = uiStateTarea.value.valoracion,
+            tecnico = uiStateTarea.value.tecnico,
+            descripcion = uiStateTarea.value.descripcion
+        )
+    }
+    fun getTarea(id: Long) {
+        tarea = Repository.getTarea(id)
+        //si no es nueva inicia la UI con los valores de la tarea
+        if (tarea != null) tareaToUiState(tarea!!)
+    }
+
 }
