@@ -1,5 +1,6 @@
 package net.iessochoa.dennisperezortiz.tareasv01.ui.screens.tarea
 
+import AppBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,8 +52,14 @@ import net.iessochoa.dennisperezortiz.tareasv01.ui.components.RatingBar
 import net.iessochoa.dennisperezortiz.tareasv01.ui.theme.TareasV01Theme
 
 @Composable
-fun TareaScreen(viewModel: TareaViewModel = viewModel()) {
+fun TareaScreen(
+    idTarea: Long? = null,
+    onVolver: () -> Unit = {},
+    viewModel: TareaViewModel = viewModel(),
+    modifier: Modifier = Modifier
+) {
 
+    
 //creamos el estado de uiStateTarea, el estado de SnackBar y el de CoroutineScope. Aparte de comentar todos los demas que son inutiles al usar UiState
 
     val uiStateTarea by viewModel.uiStateTarea.collectAsState()
@@ -82,7 +89,14 @@ fun TareaScreen(viewModel: TareaViewModel = viewModel()) {
     //Inicializamos el esqueleto de la aplicación con scaffold, donde importaremos varias 4 cosas de el archivo components, como los dropdowns/selects, el radiobutton con las tres opciones definidas en strings.xml y el ratingBar
     Scaffold(
         containerColor = uiStateTarea.colorFondo,
-        snackbarHost = { SnackbarHost(snackbarHostState)},
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            AppBar(
+                tituloPantallaActual = idTarea?.let { stringResource(R.string.titulo_pantalla) } ?: stringResource(R.string.titulo_pantalla_nueva),
+                puedeNavegarAtras = true,
+                navegaAtras = onVolver
+            )
+        },
         //Creamos el floatingbutton como explica la tarea difiniendo sus acciones y haciendo uso de el uistate creado si esta bien o un mensaje snackbar si falta por rellenar tecnico y/o descripción.
         floatingActionButton = {
             FloatingActionButton(onClick = {

@@ -17,11 +17,14 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application.applicationContext
 
     val listaPrioridad = context.resources.getStringArray(R.array.prioridad_tarea).toList()
+
     val listaCategoria = context.resources.getStringArray(R.array.categoria_tarea).toList()
+
+    private val PRIORIDAD_ALTA = listaPrioridad[2]
 
     val listaEstado = context.resources.getStringArray(R.array.estado_tarea).toList()
 
-    private val PRIORIDAD_ALTA = listaPrioridad[2]
+    var tarea: Tarea? = null
 
     private val _uiStateTarea = MutableStateFlow(
         UiStateTarea(
@@ -29,8 +32,6 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
         )
     )
     val uiStateTarea: StateFlow<UiStateTarea> = _uiStateTarea.asStateFlow()
-
-    var tarea: Tarea? = null
 
     fun onValueChangePrioridad(nuevaPrioridad: String) {
         val colorFondo: Color = if (PRIORIDAD_ALTA == nuevaPrioridad) {
@@ -74,6 +75,12 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
+    private fun validaFormulario() {
+        _uiStateTarea.value = _uiStateTarea.value.copy(
+            esFormularioValido = uiStateTarea.value.tecnico.isNotBlank() && uiStateTarea.value.descripcion.isNotBlank()
+        )
+    }
+
     //Nuevas acciones de guardar para que si apretamos el boton guardar, se abra el dialogo, y al apretar dentro del dialogo a cualquier accion como cancel u ok, se deje de mostrar el dialogo
     fun onGuardar() {
         _uiStateTarea.value = _uiStateTarea.value.copy(
@@ -93,6 +100,10 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
+    /**
+     *Carga los datos de la tarea en UiState,
+     * que a su vez actualiza la interfaz de usuario *
+     */
     fun tareaToUiState(tarea: Tarea) {
         _uiStateTarea.value = _uiStateTarea.value.copy(
             categoria = listaCategoria[tarea.categoria],
@@ -110,6 +121,9 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
+    /**
+     * Extrae los datos de la interfaz de usuario y los convierte en un objeto Tarea.
+     */
     fun uiStateToTarea(): Tarea {
         return if (uiStateTarea.value.esTareaNueva)
         //si es nueva, le asigna un id
@@ -135,6 +149,7 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
             descripcion = uiStateTarea.value.descripcion
         )
     }
+
     fun getTarea(id: Long) {
         tarea = Repository.getTarea(id)
         //si no es nueva inicia la UI con los valores de la tarea

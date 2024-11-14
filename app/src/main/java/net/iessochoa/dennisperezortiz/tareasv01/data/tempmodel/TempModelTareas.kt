@@ -7,6 +7,7 @@ import net.iessochoa.dennisperezortiz.tareasv01.data.db.entities.Tarea
 import kotlin.random.Random
 
 object TempModelTareas {
+
     //lista de tareas
     private val listaTareas = ArrayList<Tarea>()
     //StateFlow observable
@@ -42,6 +43,9 @@ object TempModelTareas {
         return listaTareas.find { it.id == id }
     }
 
+    /**
+     * Crea unas Tareas de prueba de forma aleatoria.
+     */
     fun iniciaPruebaTareas() {
         val tecnicos = listOf(
             "Pepe Gotero",
@@ -52,7 +56,8 @@ object TempModelTareas {
             "Zape Gómez",
             "Pepito Grillo"
         )
-        val fotos= listOf(R.drawable.foto_tarea,R.drawable.foto2,R.drawable.foto3,R.drawable.foto4)
+        val fotos=
+            listOf(R.drawable.foto_tarea,R.drawable.foto2,R.drawable.foto3,R.drawable.foto4)
         lateinit var tarea: Tarea
         (1..10).forEach({
             tarea = Tarea(
@@ -69,7 +74,6 @@ object TempModelTareas {
         })
         _tareasStateFlow.value = listaTareas
     }
-
     //Permite iniciar el objeto Singleton
     operator fun invoke(){
         //this.application= context.applicationContext as Application
