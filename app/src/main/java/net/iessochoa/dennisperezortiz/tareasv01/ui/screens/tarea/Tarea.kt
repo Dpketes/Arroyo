@@ -1,6 +1,5 @@
 package net.iessochoa.dennisperezortiz.tareasv01.ui.screens.tarea
 
-import AppBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import net.iessochoa.dennisperezortiz.tareasv01.R
+import net.iessochoa.dennisperezortiz.tareasv01.ui.components.AppBar
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.BasicRadioButton
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DialogoDeConfirmacion
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DropdownMenu
@@ -61,6 +61,9 @@ fun TareaScreen(
 
     
 //creamos el estado de uiStateTarea, el estado de SnackBar y el de CoroutineScope. Aparte de comentar todos los demas que son inutiles al usar UiState
+
+    if (idTarea!= null)
+        viewModel.getTarea(idTarea!!)
 
     val uiStateTarea by viewModel.uiStateTarea.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
