@@ -12,7 +12,8 @@
         <item>otros</item>
 
     </string-array>
-    
+
+    <string name="titulo_lista_tarea">Lista de Tareas</string>
     <string name="titulo_pantalla">Tarea #$it</string>
     <string name="titulo_pantalla_nueva">Nueva Tarea</string>
 
