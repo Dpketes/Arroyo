@@ -39,7 +39,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
@@ -49,7 +48,6 @@ import net.iessochoa.dennisperezortiz.tareasv01.ui.components.BasicRadioButton
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DialogoDeConfirmacion
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DropdownMenu
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.RatingBar
-import net.iessochoa.dennisperezortiz.tareasv01.ui.theme.TareasV01Theme
 
 @Composable
 fun TareaScreen(
@@ -62,8 +60,7 @@ fun TareaScreen(
     
 //creamos el estado de uiStateTarea, el estado de SnackBar y el de CoroutineScope. Aparte de comentar todos los demas que son inutiles al usar UiState
 
-    if (idTarea!= null)
-        viewModel.getTarea(idTarea!!)
+    idTarea?.let { viewModel.getTarea(it) }
 
     val uiStateTarea by viewModel.uiStateTarea.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -95,7 +92,7 @@ fun TareaScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             AppBar(
-                tituloPantallaActual = idTarea?.let { stringResource(R.string.titulo_pantalla) } ?: stringResource(R.string.titulo_pantalla_nueva),
+                tituloPantallaActual = if (idTarea == null) stringResource(R.string.titulo_pantalla_nueva) else stringResource(R.string.titulo_pantalla, idTarea),
                 puedeNavegarAtras = true,
                 navegaAtras = onVolver
             )
@@ -103,9 +100,9 @@ fun TareaScreen(
         //Creamos el floatingbutton como explica la tarea difiniendo sus acciones y haciendo uso de el uistate creado si esta bien o un mensaje snackbar si falta por rellenar tecnico y/o descripción.
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                if (uiStateTarea.esFormularioValido)
+                if (uiStateTarea.esFormularioValido) {
                     viewModel.onGuardar()
-                else {
+                } else {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = mensajeFaltaCampos,
@@ -240,13 +237,4 @@ fun TareaScreen(
             }
         }
     )
-}
-
-//Inicializo preview para que veamos la aplicacion graficamente mientras la desarrollamos, junto con su import arriba
-@Preview(showBackground = true)
-@Composable
-fun TareaScreenPreview() {
-    TareasV01Theme {
-        TareaScreen()
-    }
 }

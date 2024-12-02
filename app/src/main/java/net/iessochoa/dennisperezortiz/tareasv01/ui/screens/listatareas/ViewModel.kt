@@ -10,12 +10,12 @@ import net.iessochoa.dennisperezortiz.tareasv01.data.repository.Repository
 
 class ListaTareasViewModel() : ViewModel() {
 
-    val listaTareasUiState : StateFlow<ListaUiState> =
-        //transformamos el flow de tareas en el Stateflow de ListaUiState
-        Repository.getAllTareas().map {ListaUiState(it)}.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ListaUiState()
-        )
+    val listaTareasUiState: StateFlow<ListaUiState> =
+        Repository.getAllTareas().map { ListaUiState(it ?: listOf()) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = ListaUiState()
+            )
 
 }

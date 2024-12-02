@@ -19,7 +19,7 @@ fun AppBar(
     navegaAtras: () -> Unit = {},
     modifier: Modifier = Modifier
 ){
-    TopAppBar(
+     TopAppBar(
         title = {
             Text(text = tituloPantallaActual)
         },

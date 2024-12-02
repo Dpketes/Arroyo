@@ -40,7 +40,7 @@ fun ListaTareasScreen(
         topBar = {
             AppBar(
                 tituloPantallaActual = stringResource(titulo_lista_tarea),
-                puedeNavegarAtras = false
+                puedeNavegarAtras = false,
             )
         },
         floatingActionButton = {
@@ -49,36 +49,38 @@ fun ListaTareasScreen(
             }
         }
     ) { innerPadding ->
-        Column(
+            Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+                uiState.listaTareas.forEachIndexed { pos, item ->
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                item.id?.let {
+                                    onItemModificarClick(it)
+                                }
+                            }
+                            .padding(8.dp)
+                    ) {
+                        Text(
+                            text = "${item.id} - ${item.prioridad} - ${item.estado} - ${item.tecnico}",
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    HorizontalDivider(color = Color.Blue, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
-            uiState.listaPalabras.forEachIndexed { pos, item ->
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onItemModificarClick(item.id !!) }
-                        .padding(8.dp)
-                ) {
-                    Text(
-                        text = "${item.id} - ${item.prioridad} - ${item.estado} - ${item.tecnico}",
-                        modifier = Modifier.fillMaxWidth()
-                    )
                 }
-                HorizontalDivider(color = Color.Blue, thickness = 1.dp)
-
-            }
-
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TareaScreenPreview() {
+fun ListaTareasScreenPreview() {
     TareasV01Theme {
         ListaTareasScreen()
     }
