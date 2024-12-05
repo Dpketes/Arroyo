@@ -71,7 +71,7 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
     fun onDescripcionChange(descripcion: String) {
         _uiStateTarea.value = _uiStateTarea.value.copy(
             descripcion = descripcion,
-            esFormularioValido = descripcion.isNotBlank() && _uiStateTarea.value.descripcion.isNotBlank()
+            esFormularioValido = descripcion.isNotBlank() && uiStateTarea.value.tecnico.isNotBlank()
         )
     }
 

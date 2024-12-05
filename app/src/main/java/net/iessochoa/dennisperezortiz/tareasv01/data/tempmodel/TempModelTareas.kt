@@ -79,5 +79,4 @@ object TempModelTareas {
         //this.application= context.applicationContext as Application
         iniciaPruebaTareas()
     }
-
 }

@@ -1,7 +1,7 @@
 package net.iessochoa.dennisperezortiz.tareasv01.data.db.entities
 
 data class Tarea(
-    var id:Long?=null,//id único
+    val id:Long?=null,//id único
     val categoria:Int,
     val prioridad:Int,
     val img:String,
