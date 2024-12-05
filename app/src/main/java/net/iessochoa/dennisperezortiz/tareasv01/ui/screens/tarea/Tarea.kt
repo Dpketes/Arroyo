@@ -68,7 +68,7 @@ fun TareaScreen(
 
     //Aqui almacenamos el estado actual de los campos
     //var categoriaSeleccionada by remember { mutableStateOf("") }
-    //var prioridadSeleccionada by remember { mutableStateOf("") }
+    //
     //var isPagado by remember { mutableStateOf(false) }
     //val estadoTarea = remember { mutableStateOf("") }
     //var valoracionCliente by remember { mutableIntStateOf(0) }

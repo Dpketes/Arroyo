@@ -12,5 +12,5 @@ object Repository {
     fun addTarea(tarea: Tarea)= TempModelTareas.addTarea(tarea)
     fun delTarea(tarea: Tarea)= TempModelTareas.delTarea(tarea)
     fun getAllTareas()= TempModelTareas.getAllTareas()
-    fun getTarea(id:Long)= TempModelTareas.getTarea(id)
+    fun getTarea(id: Long) = TempModelTareas.getTarea(id)
 }

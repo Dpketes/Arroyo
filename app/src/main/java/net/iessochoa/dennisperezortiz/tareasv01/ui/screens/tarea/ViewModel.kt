@@ -25,6 +25,7 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
     val listaEstado = context.resources.getStringArray(R.array.estado_tarea).toList()
 
     var tarea: Tarea? = null
+    var datosCargados = false
 
     private val _uiStateTarea = MutableStateFlow(
         UiStateTarea(
@@ -151,9 +152,14 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getTarea(id: Long) {
-        tarea = Repository.getTarea(id)
-        //si no es nueva inicia la UI con los valores de la tarea
-        if (tarea != null) tareaToUiState(tarea!!)
+        if (!datosCargados){
+            tarea = Repository.getTarea(id)
+            datosCargados = true
+
+            if (tarea != null) {
+                tareaToUiState(tarea!!)
+            }
+        }
     }
 
 }

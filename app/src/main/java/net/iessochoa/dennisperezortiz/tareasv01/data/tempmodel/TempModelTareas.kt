@@ -38,6 +38,7 @@ object TempModelTareas {
         listaTareas.remove(tarea)
         _tareasStateFlow.value = listaTareas
     }
+
     //obtiene una tarea a partir de su id
     fun getTarea(id: Long): Tarea? {
         return listaTareas.find { it.id == id }
