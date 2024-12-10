@@ -43,4 +43,16 @@
     <string name="tarea_guardada">Tarea guardada</string>
     <string name="dialogo_title">Atención</string>
     <string name="dialogo_context">Desea guardar los cambios?</string>
+
+
+    //Certificado Google ->
+
+    <array name="com_google_android_gms_fonts_certs">
+        <item>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7PvcZxWtI6sHKF9FrI1AxC3t
+            UQe7nd4zVzEheX2CfmZIx+e1Q7OXu9F8ejb9RaVZVLcFeaEvBFe3tGj2UJ80DGDpIC5g
+            f4A1iISu7iCQIDQI/xP+aVvX/ISlY1i6D7mlmZWeCtRny8sAf5eV6LSUOeKqni1SKV30
+            +2nOgPhFLgO0PzBU0YJDYdEx6vvW0/RDB/j2CI7pZUpgR0z/nvhCgmxdHR5YWE4IivOn
+            +sqshlmsmykLOMN3RFG/OZX+KDA6pDIz4+/27sKw1rE6G9P+nri9shDyhXVtj1kXqI/p
+            ODFObdE5wBlUNXHcHQE4jKsF9Un4NBcd5ewEhoHYMcL0JLVwIDAQAB</item>
+    </array>
 </resources>
