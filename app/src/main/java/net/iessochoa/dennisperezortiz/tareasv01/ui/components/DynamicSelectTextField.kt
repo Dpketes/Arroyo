@@ -19,16 +19,23 @@ import androidx.compose.ui.Modifier
 //Creamos la funcion dropdown o select como quieras llamarlo y le he definido la logica
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenu(options: List<String>, label: String, onSelectionChanged: (String) -> Unit) {
+fun DropdownMenu(
+    options: List<String>,
+    label: String,
+    onSelectionChanged: (String) -> Unit,
+    selectedValue: String,
+    modifier: Modifier = Modifier
+
+) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(options[0]) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier
     ) {
         OutlinedTextField(
-            value = selectedOption,
+            value = selectedValue,
             onValueChange = { },
             readOnly = true,
             label = { Text(label) },
@@ -48,7 +55,6 @@ fun DropdownMenu(options: List<String>, label: String, onSelectionChanged: (Stri
                 DropdownMenuItem(
                     text = { Text(option) },
                     onClick = {
-                        selectedOption = option
                         onSelectionChanged(option)
                         expanded = false
                     }

@@ -39,6 +39,7 @@ fun ListaTareasScreen(
             AppBar(
                 tituloPantallaActual = stringResource(titulo_lista_tarea),
                 puedeNavegarAtras = false,
+                navegaAtras = {}
             )
         },
         floatingActionButton = {
@@ -67,6 +68,8 @@ fun ListaTareasScreen(
 @Composable
 fun ListaTareasScreenPreview() {
     TareasV01Theme {
-        ListaTareasScreen()
+        ListaTareasScreen(
+            onClickNueva = {}
+        )
     }
 }

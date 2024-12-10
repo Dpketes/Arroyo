@@ -23,14 +23,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,8 +60,6 @@ fun TareaScreen(
     idTarea?.let { viewModel.getTarea(it) }
 
     val uiStateTarea by viewModel.uiStateTarea.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     //Aqui almacenamos el estado actual de los campos
     //var categoriaSeleccionada by remember { mutableStateOf("") }
@@ -83,13 +78,11 @@ fun TareaScreen(
     //Como dices que hay usar strings.xml para lo que sea texto, me he creado mis valores, ya que no me dejaba hacerlo dentro del message directamente.
     val mensajeFaltaCampos = stringResource(R.string.message_falta_campos)
     val tareaGuardada = stringResource(R.string.tarea_guardada)
-    val tituloDialogo = stringResource(R.string.dialogo_title)
-    val contextDialogo = stringResource(R.string.dialogo_context)
 
     //Inicializamos el esqueleto de la aplicación con scaffold, donde importaremos varias 4 cosas de el archivo components, como los dropdowns/selects, el radiobutton con las tres opciones definidas en strings.xml y el ratingBar
     Scaffold(
         containerColor = uiStateTarea.colorFondo,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(hostState = uiStateTarea.snackbarHostState) },
         topBar = {
             AppBar(
                 tituloPantallaActual = if (idTarea == null) stringResource(R.string.titulo_pantalla_nueva) else stringResource(R.string.titulo_pantalla, idTarea),
@@ -102,9 +95,10 @@ fun TareaScreen(
             FloatingActionButton(onClick = {
                 if (uiStateTarea.esFormularioValido) {
                     viewModel.onGuardar()
+                    onVolver()
                 } else {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
+                    uiStateTarea.scope.launch {
+                        uiStateTarea.snackbarHostState.showSnackbar(
                             message = mensajeFaltaCampos,
                             duration = SnackbarDuration.Short
                         )
@@ -132,8 +126,8 @@ fun TareaScreen(
                     horizontalArrangement = Arrangement.Center
                     ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        DropdownMenu(viewModel.listaCategoria, stringResource(R.string.categoria), onSelectionChanged = { viewModel.onCategoriaChange(it) })
-                        DropdownMenu(viewModel.listaPrioridad, stringResource(R.string.prioridad), onSelectionChanged = { viewModel.onValueChangePrioridad(it)})
+                        DropdownMenu(viewModel.listaCategoria, stringResource(R.string.categoria), onSelectionChanged = { viewModel.onCategoriaChange(it) }, selectedValue = uiStateTarea.categoria)
+                        DropdownMenu(viewModel.listaPrioridad, stringResource(R.string.prioridad), onSelectionChanged = { viewModel.onValueChangePrioridad(it)}, selectedValue = uiStateTarea.prioridad)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Image(
@@ -169,7 +163,6 @@ fun TareaScreen(
                             else -> null
                         }
 
-                        //He utilizado el let este que aunque no sabia para que servia la propia aplicación para cachear un error de implementación me lo ha metido por medio
                         iconId?.let { id ->
                             Icon(
                                 painter = painterResource(id = id),
@@ -221,15 +214,15 @@ fun TareaScreen(
                         onConfirmation = {
                             //guardaría los cambios
                             viewModel.onConfirmarDialogoGuardar()
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
+                            uiStateTarea.scope.launch {
+                                uiStateTarea.snackbarHostState.showSnackbar(
                                     message = tareaGuardada,
                                     duration = SnackbarDuration.Short
                                 )
                             }
                         },
-                        dialogTitle = tituloDialogo,
-                        dialogText = contextDialogo,
+                        dialogTitle = stringResource(R.string.dialogo_title),
+                        dialogText = stringResource(R.string.dialogo_context),
                         icon = Icons.Default.Info
                     )
 

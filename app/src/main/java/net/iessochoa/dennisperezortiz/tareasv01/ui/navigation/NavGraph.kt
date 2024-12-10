@@ -15,7 +15,6 @@ fun AppNavigation() {
         navController = navController,
         startDestination = ListaTareasDestination
 
-
     ){
 
         composable<ListaTareasDestination>{
@@ -28,8 +27,6 @@ fun AppNavigation() {
                 }
             )
         }
-
-
         composable<TareaDestination>{ backStackEntry ->
             val tarea: TareaDestination = backStackEntry.toRoute()
             TareaScreen(

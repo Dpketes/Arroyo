@@ -1,8 +1,10 @@
 package net.iessochoa.dennisperezortiz.tareasv01.ui.screens.tarea
 
 import android.app.Application
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +31,17 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _uiStateTarea = MutableStateFlow(
         UiStateTarea(
-            prioridad = listaPrioridad[0]
+            prioridad = listaPrioridad[0],
+            categoria = listaCategoria[0],
+            pagado = false,
+            estado = listaEstado[0],
+            valoracion = 0,
+            tecnico = "",
+            descripcion = "",
+            esFormularioValido = false,
+            mostrarDialogo = false,
+            snackbarHostState = SnackbarHostState(),
+            scope = viewModelScope
         )
     )
     val uiStateTarea: StateFlow<UiStateTarea> = _uiStateTarea.asStateFlow()
@@ -65,20 +77,14 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
     fun onTecnicoChange(tecnico: String) {
         _uiStateTarea.value = _uiStateTarea.value.copy(
             tecnico = tecnico,
-            esFormularioValido = tecnico.isNotBlank() && _uiStateTarea.value.descripcion.isNotBlank()
+            esFormularioValido = tecnico.isNotBlank() && _uiStateTarea.value.tecnico.isNotBlank()
         )
     }
 
     fun onDescripcionChange(descripcion: String) {
         _uiStateTarea.value = _uiStateTarea.value.copy(
             descripcion = descripcion,
-            esFormularioValido = descripcion.isNotBlank() && uiStateTarea.value.tecnico.isNotBlank()
-        )
-    }
-
-    private fun validaFormulario() {
-        _uiStateTarea.value = _uiStateTarea.value.copy(
-            esFormularioValido = uiStateTarea.value.tecnico.isNotBlank() && uiStateTarea.value.descripcion.isNotBlank()
+            esFormularioValido = descripcion.isNotBlank() && uiStateTarea.value.descripcion.isNotBlank()
         )
     }
 
@@ -87,6 +93,7 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
         _uiStateTarea.value = _uiStateTarea.value.copy(
             mostrarDialogo = true
         )
+        Repository.addTarea(uiStateToTarea())
     }
 
     fun onConfirmarDialogoGuardar() {
