@@ -95,7 +95,7 @@ fun TareaScreen(
             FloatingActionButton(onClick = {
                 if (uiStateTarea.esFormularioValido) {
                     viewModel.onGuardar()
-                    onVolver()
+
                 } else {
                     uiStateTarea.scope.launch {
                         uiStateTarea.snackbarHostState.showSnackbar(
@@ -220,6 +220,7 @@ fun TareaScreen(
                                     duration = SnackbarDuration.Short
                                 )
                             }
+                            onVolver()
                         },
                         dialogTitle = stringResource(R.string.dialogo_title),
                         dialogText = stringResource(R.string.dialogo_context),

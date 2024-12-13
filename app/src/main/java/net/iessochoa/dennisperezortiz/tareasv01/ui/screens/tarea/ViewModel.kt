@@ -5,9 +5,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import net.iessochoa.dennisperezortiz.tareasv01.R
 import net.iessochoa.dennisperezortiz.tareasv01.data.db.entities.Tarea
 import net.iessochoa.dennisperezortiz.tareasv01.data.repository.Repository
@@ -88,18 +90,22 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    //Nuevas acciones de guardar para que si apretamos el boton guardar, se abra el dialogo, y al apretar dentro del dialogo a cualquier accion como cancel u ok, se deje de mostrar el dialogo
     fun onGuardar() {
         _uiStateTarea.value = _uiStateTarea.value.copy(
             mostrarDialogo = true
         )
-        Repository.addTarea(uiStateToTarea())
     }
 
     fun onConfirmarDialogoGuardar() {
+        //cierra el dialogo
         _uiStateTarea.value = _uiStateTarea.value.copy(
             mostrarDialogo = false
         )
+        //lanzamos la corrutina para guardar la tarea
+        viewModelScope.launch(Dispatchers.IO) {
+            Repository.addTarea(uiStateToTarea())
+        }
+
     }
 
     fun onCancelarDialogoGuardar() {
@@ -159,14 +165,12 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getTarea(id: Long) {
-        if (!datosCargados){
+        //lanzamos una corrutina que nos devuelve la tarea de la bd
+        viewModelScope.launch(Dispatchers.IO) {
             tarea = Repository.getTarea(id)
-            datosCargados = true
-
-            if (tarea != null) {
-                tareaToUiState(tarea!!)
-            }
+            if (tarea != null) tareaToUiState(tarea!!)
         }
     }
+
 
 }
