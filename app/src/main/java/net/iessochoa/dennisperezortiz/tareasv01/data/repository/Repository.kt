@@ -1,5 +1,6 @@
 package net.iessochoa.dennisperezortiz.tareasv01.data.repository
 
+import kotlinx.coroutines.flow.Flow
 import net.iessochoa.dennisperezortiz.tareasv01.TareasApplication
 import net.iessochoa.dennisperezortiz.tareasv01.data.db.dao.TareasDao
 import net.iessochoa.dennisperezortiz.tareasv01.data.db.database.TareasDataBase
@@ -21,5 +22,14 @@ object Repository {
     suspend fun delTarea(tarea: Tarea)= modelTareas.delTarea(tarea)
     suspend fun getTarea(id:Long)= modelTareas.getTarea(id)
     fun getAllTareas()= modelTareas.getTareas()
+    fun getTareasByEstado(estado: Int): Flow<List<Tarea>> =
+        modelTareas.getTareasByEstado(estado)
+
+    fun getTareasSinPagar(): Flow<List<Tarea>> =
+        modelTareas.getTareasSinPagar()
+
+    fun getTareasByEstadoYNoPagadas(estado: Int): Flow<List<Tarea>> =
+        modelTareas.getTareasByEstadoYNoPagadas(estado)
+
 }
 
