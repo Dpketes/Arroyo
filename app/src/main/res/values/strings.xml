@@ -43,6 +43,7 @@
     <string name="tarea_guardada">Tarea guardada</string>
     <string name="dialogo_title">Atención</string>
     <string name="dialogo_context">Desea guardar los cambios?</string>
+    <string name="dialogo_context_borrar">¿Desea borrar la tarea?</string>
 
 
     //Certificado Google ->
