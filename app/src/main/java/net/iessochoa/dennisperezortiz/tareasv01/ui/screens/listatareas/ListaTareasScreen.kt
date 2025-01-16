@@ -1,5 +1,6 @@
 package net.iessochoa.dennisperezortiz.tareasv01.ui.screens.listatareas
 
+import TopAppBarListas
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,8 +33,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import net.iessochoa.dennisperezortiz.tareasv01.R
-import net.iessochoa.dennisperezortiz.tareasv01.R.string.titulo_lista_tarea
-import net.iessochoa.dennisperezortiz.tareasv01.ui.components.AppBar
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DialogoDeConfirmacion
 import net.iessochoa.dennisperezortiz.tareasv01.ui.theme.TareasV01Theme
 
@@ -57,11 +56,8 @@ fun ListaTareasScreen(
 
     Scaffold(
         topBar = {
-            AppBar(
-                tituloPantallaActual = stringResource(titulo_lista_tarea),
-                puedeNavegarAtras = false,
-                navegaAtras = {}
-            )
+            //Llamamos a la funcion creada TopAppBarListas.
+            TopAppBarListas()
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onClickNueva) {

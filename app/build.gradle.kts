@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     //room
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.benchmark.macro)
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
