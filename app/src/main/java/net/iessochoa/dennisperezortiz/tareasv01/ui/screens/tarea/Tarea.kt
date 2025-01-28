@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -61,11 +63,11 @@ fun TareaScreen(
     idTarea: Long? = null,
     onVolver: () -> Unit = {},
     viewModel: TareaViewModel = viewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
 
-    
-//creamos el estado de uiStateTarea, el estado de SnackBar y el de CoroutineScope. Aparte de comentar todos los demas que son inutiles al usar UiState
+    //creamos el estado de uiStateTarea, el estado de SnackBar y el de CoroutineScope. Aparte de comentar todos los demas que son inutiles al usar UiState
 
     idTarea?.let { if(!viewModel.cargado){
         viewModel.getTarea(it)
@@ -163,6 +165,8 @@ Permisos:
         }
     )
 
+    val uriImagen = uiStateTarea.uriImagen
+
     //Inicializamos el esqueleto de la aplicación con scaffold, donde importaremos varias 4 cosas de el archivo components, como los dropdowns/selects, el radiobutton con las tres opciones definidas en strings.xml y el ratingBar
     Scaffold(
         containerColor = uiStateTarea.colorFondo,
@@ -215,15 +219,16 @@ Permisos:
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     AsyncImage(
-                        model = if (uiStateTarea.uriImagen.isEmpty())
-                            R.drawable.sinimagen
-                        else
-                            uiStateTarea.uriImagen,
+                        model = if (uriImagen.isEmpty()) R.drawable.sinimagen else uriImagen,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
                             .aspectRatio(2f)
-                            .clip(RoundedCornerShape(16.dp)),
+                            .clip(RoundedCornerShape(16.dp))
+                            .clickable {
+                                val uriSafe = Uri.encode(uriImagen)
+                                navController.navigate("image_screen/$uriSafe")
+                            },
                         contentScale = ContentScale.Crop
                     )
                 }
