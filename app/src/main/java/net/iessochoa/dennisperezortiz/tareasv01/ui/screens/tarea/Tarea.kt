@@ -1,5 +1,9 @@
 package net.iessochoa.dennisperezortiz.tareasv01.ui.screens.tarea
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +52,8 @@ import net.iessochoa.dennisperezortiz.tareasv01.ui.components.BasicRadioButton
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DialogoDeConfirmacion
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DropdownMenu
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.RatingBar
+import net.iessochoa.dennisperezortiz.tareasv01.utils.loadFromUri
+import net.iessochoa.dennisperezortiz.tareasv01.utils.saveBitmapImage
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -111,6 +117,52 @@ Permisos:
         }
     )
 
+    /*
+     Llamada a Galeria versión por encima de Versión 13 en Android. Para usarlo en
+     versiones inferiores
+     tenéis incluir el Service de google que aparece en el manifest.xml
+    */
+    val launcherGaleria = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri: Uri? ->
+            // Verifica si el URI no es nulo
+            if (uri != null) {
+                try {
+                    // Intenta cargar la imagen y guardar una copia
+                    uiStateTarea.scope.launch {
+                        val bitmap = loadFromUri(context, uri)
+                        if (bitmap != null) {
+                            val uriCopia = saveBitmapImage(context, bitmap)
+                            viewModel.setUri(uriCopia.toString())
+                        } else {
+                            // Muestra un mensaje de error si la imagen no se puede cargar
+                            uiStateTarea.snackbarHostState.showSnackbar(
+                                message = "Error al cargar la imagen seleccionada.",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    uiStateTarea.scope.launch {
+                        uiStateTarea.snackbarHostState.showSnackbar(
+                            message = "Error inesperado: ${e.message}",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            } else {
+                // Muestra un mensaje si no se seleccionó ninguna imagen
+                uiStateTarea.scope.launch {
+                    uiStateTarea.snackbarHostState.showSnackbar(
+                        message = "No se seleccionó ninguna imagen.",
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
+        }
+    )
+
     //Inicializamos el esqueleto de la aplicación con scaffold, donde importaremos varias 4 cosas de el archivo components, como los dropdowns/selects, el radiobutton con las tres opciones definidas en strings.xml y el ratingBar
     Scaffold(
         containerColor = uiStateTarea.colorFondo,
@@ -163,7 +215,10 @@ Permisos:
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     AsyncImage(
-                        model = R.drawable.foto_tarea,
+                        model = if (uiStateTarea.uriImagen.isEmpty())
+                            R.drawable.sinimagen
+                        else
+                            uiStateTarea.uriImagen,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
@@ -185,9 +240,17 @@ Permisos:
                         onClick = {
                             if (!permissionState.allPermissionsGranted)
                                 permissionState.launchMultiplePermissionRequest()
+                            else
+                                launcherGaleria.launch(
+                                    PickVisualMediaRequest(
+                                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                                    )
+                                )
                         }) {
                         Icon(painterResource(R.drawable.ic_image_search),
-                            contentDescription = "abrir galeria"
+                            contentDescription = "abrir galeria",
+                            modifier = Modifier
+                                .padding(8.dp, 0.dp)
                         )
                     }
                     IconButton(
@@ -196,7 +259,9 @@ Permisos:
                                 permissionState.launchMultiplePermissionRequest()
                         }) {
                         Icon(painterResource(R.drawable.ic_camera),
-                            contentDescription = "abrir galeria"
+                            contentDescription = "camara",
+                            modifier = Modifier
+                                .padding(8.dp, 0.dp)
                         )
                     }
                 }

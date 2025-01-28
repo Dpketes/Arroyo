@@ -9,12 +9,8 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import androidx.core.net.toUri
 import net.iessochoa.dennisperezortiz.tareasv01.R
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -34,79 +30,52 @@ fun nombreArchivo(): String {
  */
 suspend fun saveBitmapImage(context: Context, bitmap: Bitmap): Uri? {
     val TAG = context.getString(R.string.app_name)
-    val timestamp = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-        .format(System.currentTimeMillis())
+    val timestamp = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis())
     var uri: Uri? = null
 
-
-    //Tell the media scanner about the new file so that it is immediately available to the user.
-    val values = ContentValues()
-    values.put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-    values.put(MediaStore.Images.Media.DATE_ADDED, timestamp)
-    //mayor o igual a version 29
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        values.put(MediaStore.Images.Media.DATE_TAKEN, timestamp)
-        values.put(
-            MediaStore.Images.Media.RELATIVE_PATH,
-            "Pictures/" + context.getString(R.string.app_name)
-        )
-        values.put(MediaStore.Images.Media.IS_PENDING, true)
-
-        uri = context.contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            values
-        )
-        if (uri != null) {
-            try {
-                val outputStream = context.contentResolver.openOutputStream(uri)
-                if (outputStream != null) {
-                    try {
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                        outputStream.close()
-                    } catch (e: Exception) {
-                        Log.e(TAG, "saveBitmapImage: ", e)
-                    }
-                }
-                values.put(MediaStore.Images.Media.IS_PENDING, false)
-                context.contentResolver.update(uri, values, null, null)
-
-                // Toast.makeText(requireContext(), "Saved...", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                Log.e(TAG, "saveBitmapImage: ", e)
-            }
-        }
-    } else {//no me funciona bien en versiones inferiores a la 29(Android 10)
-        val imageFileFolder = File(
-            Environment.getExternalStorageDirectory()
-                .toString() + '/' + context.getString(R.string.app_name)
-        )
-        if (!imageFileFolder.exists()) {
-            imageFileFolder.mkdirs()
-        }
-        val mImageName = "$timestamp.png"
-        val imageFile = File(imageFileFolder, mImageName)
-        try {
-            val outputStream: OutputStream = FileOutputStream(imageFile)
-            try {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                outputStream.close()
-            } catch (e: Exception) {
-                Log.e(TAG, "saveBitmapImage: ", e)
-            }
-            values.put(MediaStore.Images.Media.DATA, imageFile.absolutePath)
-
-            context.contentResolver.insert(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                values
-            )
-            uri = imageFile.toUri()
-            // Toast.makeText(requireContext(), "Saved...", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Log.e(TAG, "saveBitmapImage: ", e)
+    val values = ContentValues().apply {
+        put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+        put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/" + context.getString(R.string.app_name))
+            put(MediaStore.Images.Media.IS_PENDING, 1)
         }
     }
+
+    try {
+        uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        if (uri == null) {
+            Log.e(TAG, "No se pudo insertar en el ContentResolver.")
+            return null
+        }
+
+        context.contentResolver.openOutputStream(uri).use { outputStream ->
+            if (outputStream == null) {
+                Log.e(TAG, "No se pudo abrir el OutputStream.")
+                return null
+            }
+
+            if (!bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
+                Log.e(TAG, "Error al comprimir el bitmap.")
+                return null
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.put(MediaStore.Images.Media.IS_PENDING, 0)
+            context.contentResolver.update(uri, values, null, null)
+        }
+    } catch (e: Exception) {
+        Log.e(TAG, "Error al guardar la imagen: ${e.message}", e)
+        uri?.let { context.contentResolver.delete(it, null, null) }
+        return null
+    }
+
+    Log.d(TAG, "Imagen guardada con éxito: $uri")
     return uri
 }
+
 
 /**
  * Carga una imagen desde una uri.

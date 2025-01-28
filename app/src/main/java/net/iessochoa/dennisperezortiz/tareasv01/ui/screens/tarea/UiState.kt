@@ -18,6 +18,7 @@ data class UiStateTarea(
     val mostrarDialogo: Boolean = false,
     val snackbarHostState: SnackbarHostState,
     val scope: CoroutineScope,
-    val esTareaNueva: Boolean = true
+    val esTareaNueva: Boolean = true,
+    val uriImagen: String = ""
 ) {
 }

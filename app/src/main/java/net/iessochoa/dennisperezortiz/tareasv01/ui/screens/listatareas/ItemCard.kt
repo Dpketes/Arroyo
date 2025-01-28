@@ -1,6 +1,5 @@
 package net.iessochoa.dennisperezortiz.tareasv01.ui.screens.listatareas
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +34,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import net.iessochoa.dennisperezortiz.tareasv01.R
 import net.iessochoa.dennisperezortiz.tareasv01.R.drawable.ic_abierto
 import net.iessochoa.dennisperezortiz.tareasv01.R.drawable.ic_cerrado
 import net.iessochoa.dennisperezortiz.tareasv01.R.drawable.ic_en_curso
@@ -71,9 +72,12 @@ fun ItemCard(
                 .height(120.dp)
                 .background(cardBackgroundColor)
         ) {
-            Image(
-                painter = painterResource(tarea.img.toInt()),
-                contentDescription = "Imagen de la tarea",
+            AsyncImage(
+                model = if (tarea.img.isEmpty())
+                    R.drawable.sinimagen
+                else
+                    tarea.img,
+                contentDescription = null,
                 modifier = Modifier
                     .width(100.dp)
                     .fillMaxHeight(),

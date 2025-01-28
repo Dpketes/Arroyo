@@ -65,7 +65,7 @@ public abstract class TareasDataBase : RoomDatabase() {
                 tarea = Tarea(
                     (0..4).random(),
                     (0..2).random(),
-                    fotos.random().toString(),
+                    img = "",//fotos.random().toString(),
                     Random.nextBoolean(),
                     (0..2).random(),
                     (0..5).random(),
