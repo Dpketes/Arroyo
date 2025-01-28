@@ -20,6 +20,8 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
 
     private val context = application.applicationContext
 
+    var cargado: Boolean = false
+
     val listaPrioridad = context.resources.getStringArray(R.array.prioridad_tarea).toList()
 
     val listaCategoria = context.resources.getStringArray(R.array.categoria_tarea).toList()
@@ -166,6 +168,7 @@ class TareaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getTarea(id: Long) {
         //lanzamos una corrutina que nos devuelve la tarea de la bd
+
         viewModelScope.launch(Dispatchers.IO) {
             tarea = Repository.getTarea(id)
             if (tarea != null) tareaToUiState(tarea!!)

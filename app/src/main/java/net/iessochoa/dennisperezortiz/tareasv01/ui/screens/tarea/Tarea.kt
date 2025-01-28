@@ -1,6 +1,5 @@
 package net.iessochoa.dennisperezortiz.tareasv01.ui.screens.tarea
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -38,6 +38,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
 import net.iessochoa.dennisperezortiz.tareasv01.R
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.AppBar
@@ -46,6 +49,7 @@ import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DialogoDeConfirmac
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.DropdownMenu
 import net.iessochoa.dennisperezortiz.tareasv01.ui.components.RatingBar
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TareaScreen(
     idTarea: Long? = null,
@@ -57,7 +61,10 @@ fun TareaScreen(
     
 //creamos el estado de uiStateTarea, el estado de SnackBar y el de CoroutineScope. Aparte de comentar todos los demas que son inutiles al usar UiState
 
-    idTarea?.let { viewModel.getTarea(it) }
+    idTarea?.let { if(!viewModel.cargado){
+        viewModel.getTarea(it)
+        viewModel.cargado = true
+    } }
 
     val uiStateTarea by viewModel.uiStateTarea.collectAsState()
 
@@ -78,6 +85,31 @@ fun TareaScreen(
     //Como dices que hay usar strings.xml para lo que sea texto, me he creado mis valores, ya que no me dejaba hacerlo dentro del message directamente.
     val mensajeFaltaCampos = stringResource(R.string.message_falta_campos)
     val tareaGuardada = stringResource(R.string.tarea_guardada)
+
+    /*
+Permisos:
+ Petición de permisos múltiples condicionales según la versión de Android
+*/
+    val permissionState = rememberMultiplePermissionsState(
+        permissions = mutableListOf(//permiso para hacer fotos
+            android.Manifest.permission.CAMERA
+        ).apply {//Permisos para la galería
+            //Si es Android menor de 10
+            if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.P) {
+                add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            }//si es Android igual o superior a 13
+            if (android.os.Build.VERSION.SDK_INT >=
+                android.os.Build.VERSION_CODES.TIRAMISU) {
+                add(android.Manifest.permission.READ_MEDIA_IMAGES)
+            }//si es Android igual o superior a 14. Este permiso no lo tengo claro si es necesario
+            //podéis probar en el dispositivo real si tenéis Android 14
+            /*if (android.os.Build.VERSION.SDK_INT >=
+           android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            add(android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+            }*/
+        }
+    )
 
     //Inicializamos el esqueleto de la aplicación con scaffold, donde importaremos varias 4 cosas de el archivo components, como los dropdowns/selects, el radiobutton con las tres opciones definidas en strings.xml y el ratingBar
     Scaffold(
@@ -130,8 +162,8 @@ fun TareaScreen(
                         DropdownMenu(viewModel.listaPrioridad, stringResource(R.string.prioridad), onSelectionChanged = { viewModel.onValueChangePrioridad(it)}, selectedValue = uiStateTarea.prioridad)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Image(
-                        painter = painterResource(id = R.drawable.foto_tarea),
+                    AsyncImage(
+                        model = R.drawable.foto_tarea,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
@@ -148,6 +180,25 @@ fun TareaScreen(
                     Text(stringResource(R.string.pagado))
                     Spacer(modifier = Modifier.width(8.dp))
                     Switch(checked = uiStateTarea.pagado, onCheckedChange = { viewModel.onPagadoChange(it)})
+
+                    IconButton(
+                        onClick = {
+                            if (!permissionState.allPermissionsGranted)
+                                permissionState.launchMultiplePermissionRequest()
+                        }) {
+                        Icon(painterResource(R.drawable.ic_image_search),
+                            contentDescription = "abrir galeria"
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            if (!permissionState.allPermissionsGranted)
+                                permissionState.launchMultiplePermissionRequest()
+                        }) {
+                        Icon(painterResource(R.drawable.ic_camera),
+                            contentDescription = "abrir galeria"
+                        )
+                    }
                 }
 
                 //Aqui veremos segun seleccionemos en el radiobutton un icono u otro
@@ -188,7 +239,6 @@ fun TareaScreen(
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
                 )
-
                 //Como dijiste en clase he metido la descripcion en un box para que se extienda al escribir, o eso tenia entendido
                 Box(modifier = Modifier
                     .fillMaxWidth()

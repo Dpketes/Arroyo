@@ -67,6 +67,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.ui.text.google.fonts)
+
+    implementation (libs.accompanist.permissions)
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     //room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.benchmark.macro)
