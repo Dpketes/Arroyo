@@ -1,6 +1,10 @@
 package net.iessochoa.dennisperezortiz.tareasv01.ui.screens.tarea
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -165,6 +169,21 @@ Permisos:
         }
     )
 
+    //Creamos el valor para navegar a la camara y para implementar en el IconButton de la camara.
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val image = result.data?.extras?.get("data") as? Bitmap
+            if (image != null) {
+                uiStateTarea.scope.launch {
+                    val uriCopia = saveBitmapImage(context, image)
+                    viewModel.setUri(uriCopia.toString())
+                }
+            }
+        }
+    }
+
     val uriImagen = uiStateTarea.uriImagen
 
     //Inicializamos el esqueleto de la aplicación con scaffold, donde importaremos varias 4 cosas de el archivo components, como los dropdowns/selects, el radiobutton con las tres opciones definidas en strings.xml y el ratingBar
@@ -262,11 +281,16 @@ Permisos:
                         onClick = {
                             if (!permissionState.allPermissionsGranted)
                                 permissionState.launchMultiplePermissionRequest()
-                        }) {
-                        Icon(painterResource(R.drawable.ic_camera),
+                            else {
+                                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                                takePictureLauncher.launch(intent)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.ic_camera),
                             contentDescription = "camara",
-                            modifier = Modifier
-                                .padding(8.dp, 0.dp)
+                            modifier = Modifier.padding(8.dp, 0.dp)
                         )
                     }
                 }
